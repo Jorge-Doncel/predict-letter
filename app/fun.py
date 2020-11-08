@@ -1,4 +1,6 @@
 import pandas as pd
+import string
+from itertools import groupby 
 
 
 def next_letter(df, *letter):
@@ -98,3 +100,73 @@ def clean_data_vowel(df, *vowel):
 
 def empty_panel(df):
     return f'You should choose {df.iloc[0].name}, {df.iloc[1].name} , {df.iloc[2].name}, {df.iloc[3].name} or  {df.iloc[4].name}'
+
+def empty_consonant(dic, letters):
+    dic=list(dic.keys())
+    total= dict.fromkeys(string.ascii_lowercase, 0)
+    total["-"]=0
+    dic = [ele for ele in dic if all(ch not in ele for ch in letters)] 
+    for i in dic:
+        for x in i:
+            total[x]+=1
+    df = pd.DataFrame.from_dict(total, orient ='index', columns=["total"])
+    df.index.name = "letter"
+    df.sort_values(by=['total'], ascending=False, inplace=True)
+    vowels=["a","e", "i", "o", "u"]
+    df.drop(vowels, axis=0, inplace=True)
+    df['per'] = (df.total * 100 / df.total.sum()).round(2)
+    final= df.total.idxmax()
+    if (df.iloc[0].per - df.iloc[1].per) < 1:
+        return f'You should choose {final} with {df.loc[final].per.round(3)}% appear or {df.iloc[1].name} with {df.loc[df.iloc[1].name].per.round(3)}% appear'
+    else:
+        return f'You should choose {final} with a {df.loc[final].per.round(3)}% appear'
+
+def empty_vowel(dic, vowel):
+    dic=list(dic.keys())
+    total= dict.fromkeys(string.ascii_lowercase, 0)
+    total["-"]=0
+    dic = [ele for ele in dic if all(ch not in ele for ch in vowel)] 
+    for i in dic:
+        for x in i:
+            total[x]+=1
+    vowels=["a","e", "i", "o", "u"]
+    df = pd.DataFrame.from_dict(total, orient ='index', columns=["total"]).loc[vowels]
+    df.index.name = "letter"
+    df.sort_values(by=['total'], ascending=False, inplace=True)
+    df['per'] = (df.total * 100 / df.total.sum()).round(2)
+    final= df.total.idxmax()
+    if (df.iloc[0].per - df.iloc[1].per) < 1:
+        return f'You should choose {final} with {df.loc[final].per.round(3)}% appear or {df.iloc[1].name} with {df.loc[df.iloc[1].name].per.round(3)}% appear'
+    else:
+        return f'You should choose {final} with a {df.loc[final].per.round(3)}% appear'
+
+def clean_empty_consonant(dic, letters):
+    dic=list(dic.keys())
+    total= dict.fromkeys(string.ascii_lowercase, 0)
+    total["-"]=0
+    dic = [ele for ele in dic if all(ch not in ele for ch in letters)] 
+    for i in dic:
+        for x in i:
+            total[x]+=1
+    df = pd.DataFrame.from_dict(total, orient ='index', columns=["total"])
+    df.index.name = "letter"
+    df.sort_values(by=['total'], ascending=False, inplace=True)
+    vowels=["a","e", "i", "o", "u"]
+    df.drop(vowels, axis=0, inplace=True)
+    df['per'] = (df.total * 100 / df.total.sum()).round(2).astype(str) + '%'
+    return df
+    
+def clean_empty_vowel(dic, vowel):
+    dic=list(dic.keys())
+    total= dict.fromkeys(string.ascii_lowercase, 0)
+    total["-"]=0
+    dic = [ele for ele in dic if all(ch not in ele for ch in vowel)] 
+    for i in dic:
+        for x in i:
+            total[x]+=1
+    vowels=["a","e", "i", "o", "u"]
+    df = pd.DataFrame.from_dict(total, orient ='index', columns=["total"]).loc[vowels]
+    df.index.name = "letter"
+    df.sort_values(by=['total'], ascending=False, inplace=True)
+    df['per'] = (df.total * 100 / df.total.sum()).round(2).astype(str) + '%'
+    return df
